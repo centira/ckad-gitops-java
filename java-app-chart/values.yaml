@@ -1,0 +1,12 @@
+# java-app-chart/values.yaml
+replicaCount: 2
+
+image:
+  repository: sentira/java-web-app
+  tag: v1 # <--- Dit passen we straks aan naar v2 en v3
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
