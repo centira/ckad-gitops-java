@@ -14,9 +14,29 @@ spec:
       labels:
         app: java-web
     spec:
+      # STAP A: Definieer een gedeelde opslagruimte (leeft zolang de Pod leeft)
+      volumes:
+      - name: gedeelde-logs
+        emptyDir: {}
+
       containers:
+      # STAP B: De Hoofdcontainer (Jouw Java-app)
       - name: java-container
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.targetPort }}
+        # Koppel de gedeelde map aan de Java container
+        volumeMounts:
+        - name: gedeelde-logs
+          mountPath: /app/logs # Java schrijft hier zijn logs naartoe
+
+      # STAP C: De Sidecar Container (De Assistent)
+      - name: sidecar-log-viewer
+        image: busybox:1.36
+        # Dit commando leest continu live het logbestand uit (tail -f)
+        command: ["/bin/sh", "-c", "while true; do if [ -f /var/log/java-app.log ]; then tail -f /var/log/java-app.log; fi; sleep 1; done"]
+        # Koppel EXACT hetzelfde volume aan de sidecar container
+        volumeMounts:
+        - name: gedeelde-logs
+          mountPath: /var/log # De sidecar kijkt in zijn eigen /var/log map
