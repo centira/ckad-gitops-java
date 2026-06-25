@@ -3,7 +3,7 @@ replicaCount: 2
 
 image:
   repository: sentira/java-web-app
-  tag: v2 # <--- Dit passen we straks aan naar v2 en v3
+  tag: v3 # <--- Dit passen we straks aan naar v2 en v3
   pullPolicy: Always
 
 service:
